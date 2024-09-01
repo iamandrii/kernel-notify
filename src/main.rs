@@ -15,7 +15,7 @@ fn main() {
             let re = Regex::new(r"kernel-core-(5\.14\.0-[0-9\.]+)\.el9_4\.x86_64\.rpm").unwrap();
             let caps = re.captures(&result.body);
             if let Some(caps) = caps {
-                Ok(caps.get(1).map_or("<empty>", |m| m.as_str()).into())
+                Ok(caps.get(1).ok_or(Error::ParsingError("Unable to parse response".into()))?.as_str().into())
             } else {
                 Err(Error::GenericError("Unable to parse".into()))
             }

@@ -4,6 +4,7 @@ use crate::network::NetworkError;
 pub enum Error {
     NetworkError(crate::network::NetworkError),
     GenericError(String),
+    ParsingError(String)
 }
 
 impl From<String> for Error {
