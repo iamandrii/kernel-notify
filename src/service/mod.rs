@@ -1,7 +1,8 @@
 use crate::network::{NetworkError, NetworkExecutor, NetworkResponse};
 use std::sync::{Arc, Mutex};
+pub mod parsers;
 
-type ParserFn = dyn Fn(NetworkResponse) -> Result<String, crate::error::Error>;
+pub type ParserFn = dyn Fn(NetworkResponse) -> Result<String, crate::error::Error>;
 
 pub trait Service {
     type Input: Send;
