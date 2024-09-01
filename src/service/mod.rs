@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 pub mod factory;
 pub mod parsers;
 
-pub type ParserFn = dyn Fn(NetworkResponse) -> Result<String, crate::error::Error>;
+pub type ParserFn = dyn Fn(NetworkResponse) -> Result<String, crate::error::Error> + Send + Sync;
 
 pub trait Service {
     type Input: Send;
