@@ -1,5 +1,6 @@
 use crate::network::{NetworkError, NetworkExecutor, NetworkResponse};
 use std::sync::{Arc, Mutex};
+pub mod factory;
 pub mod parsers;
 
 pub type ParserFn = dyn Fn(NetworkResponse) -> Result<String, crate::error::Error>;
@@ -19,10 +20,10 @@ pub struct NetworkService {
 }
 
 impl NetworkService {
-    pub fn new(key: &String, url: &String, parser: Arc<ParserFn>) -> Self {
+    pub fn new(key: &str, url: &str, parser: Arc<ParserFn>) -> Self {
         Self {
-            key: key.clone(),
-            url: url.clone(),
+            key: String::from(key),
+            url: String::from(url),
             parser,
         }
     }
