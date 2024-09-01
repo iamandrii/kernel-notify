@@ -4,6 +4,7 @@ use std::fmt::{Debug, Display};
 pub enum NetworkError {
     NoInternet,
     GenericReqwestError(reqwest::Error),
+    Not200(String),
 }
 
 impl From<reqwest::Error> for NetworkError {

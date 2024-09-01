@@ -1,5 +1,7 @@
-use crate::network::{NetworkExecutor, NetworkResult};
+use crate::network::{NetworkError, NetworkExecutor, NetworkResponse};
 use std::sync::{Arc, Mutex};
+
+type ParserFn = dyn Fn(NetworkResponse) -> Result<String, crate::error::Error>;
 
 pub trait Service {
     type Input: Send;
@@ -9,14 +11,14 @@ pub trait Service {
     fn get_latest(&self, i: Self::Input) -> Result<Self::Output, Self::Error>;
 }
 
-pub struct NetworkService<F: Fn(NetworkResult) -> Result<String, crate::error::Error>> {
+pub struct NetworkService {
     key: String,
     url: String,
-    parser: F,
+    parser: Arc<ParserFn>,
 }
 
-impl<F: Fn(NetworkResult) -> Result<String, crate::error::Error>> NetworkService<F> {
-    pub fn new(key: &String, url: &String, parser: F) -> Self {
+impl NetworkService {
+    pub fn new(key: &String, url: &String, parser: Arc<ParserFn>) -> Self {
         Self {
             key: key.clone(),
             url: url.clone(),
@@ -25,7 +27,7 @@ impl<F: Fn(NetworkResult) -> Result<String, crate::error::Error>> NetworkService
     }
 }
 
-impl<F: Fn(NetworkResult) -> Result<String, crate::error::Error>> Service for NetworkService<F> {
+impl Service for NetworkService {
     type Input = Arc<Mutex<dyn NetworkExecutor>>;
 
     type Output = String;
@@ -37,11 +39,15 @@ impl<F: Fn(NetworkResult) -> Result<String, crate::error::Error>> Service for Ne
     }
 
     fn get_latest(&self, i: Self::Input) -> Result<Self::Output, Self::Error> {
-        (self.parser)(
-            i.lock()
-                .ok()
-                .ok_or("Unable to access NetworkExecutor")?
-                .execute(self.url.clone()),
-        )
+        let resp = i
+            .lock()
+            .ok()
+            .ok_or("Unable to access NetworkExecutor")?
+            .execute(self.url.clone());
+        match resp {
+            Ok(resp) if resp.code == 200 => (self.parser)(resp),
+            Ok(resp) => Err(NetworkError::Not200(resp.body).into()),
+            Err(resp) => Err(resp.into()),
+        }
     }
 }
