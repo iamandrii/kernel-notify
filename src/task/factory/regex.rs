@@ -9,15 +9,21 @@ pub struct Regex<I> {
 }
 
 impl<'a, I> Task<'a> for Regex<I>
-where I: Send + Sync + Into<&'a str> + Clone + 'a{
+where
+    I: Send + Sync + AsRef<str> + Clone + 'a,
+{
     type Input = I;
 
-    type Output = Vec<&'a str>;
+    type Output = Vec<String>;
 
     type Error = ();
 
     fn execute(self: Box<Self>, input: Self::Input) -> Result<Self::Output, Self::Error> {
-        Ok(self.regex.captures_iter(input.clone().into()).filter_map(|m| Some(m.get(self.group)?.as_str())).collect())    
+        Ok(self
+            .regex
+            .captures_iter(&input.as_ref())
+            .filter_map(|m| Some(m.get(self.group)?.as_str().to_owned()))
+            .collect())
     }
 }
 

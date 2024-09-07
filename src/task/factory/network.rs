@@ -1,10 +1,13 @@
-use std::sync::{Mutex, Arc};
+use std::sync::{Arc, Mutex};
 
-use crate::{network::{NetworkError, NetworkExecutor, NetworkResponse}, task::Task};
+use crate::{
+    network::{NetworkError, NetworkExecutor, NetworkResponse},
+    task::Task,
+};
 
-pub struct HTTP<S>{
+pub struct HTTP<S> {
     url: S,
-    executor: Arc<Mutex<dyn NetworkExecutor>>
+    executor: Arc<Mutex<dyn NetworkExecutor>>,
 }
 
 impl<'a, S> Task<'a> for HTTP<S>

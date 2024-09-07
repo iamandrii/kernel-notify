@@ -1,15 +1,17 @@
-use crate::task::Task;
+use crate::{error::Error, task::Task};
 
-pub enum SelectorError{
-    Empty
+pub enum SelectorError {
+    Empty,
 }
 
-pub struct First<T>{
-    _phantom: std::marker::PhantomData<T>
+pub struct First<T> {
+    _phantom: std::marker::PhantomData<T>,
 }
 
 impl<'a, T> Task<'a> for First<T>
-where T: Send + Sync + 'a{
+where
+    T: Send + Sync + 'a,
+{
     type Input = Vec<T>;
 
     type Output = T;
@@ -29,12 +31,14 @@ impl<T> First<T> {
     }
 }
 
-pub struct Last<T>{
-    _phantom: std::marker::PhantomData<T>
+pub struct Last<T> {
+    _phantom: std::marker::PhantomData<T>,
 }
 
 impl<'a, T> Task<'a> for Last<T>
-where T: Send + Sync + 'a{
+where
+    T: Send + Sync + 'a,
+{
     type Input = Vec<T>;
 
     type Output = T;
@@ -54,12 +58,14 @@ impl<T> Last<T> {
     }
 }
 
-pub struct Sort<T>{
-    _phantom: std::marker::PhantomData<T>
+pub struct Sort<T> {
+    _phantom: std::marker::PhantomData<T>,
 }
 
 impl<'a, T> Task<'a> for Sort<T>
-where T: Send + Sync + Ord + 'a{
+where
+    T: Send + Sync + Ord + 'a,
+{
     type Input = Vec<T>;
 
     type Output = Vec<T>;
